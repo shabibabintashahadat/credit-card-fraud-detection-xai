@@ -1,5 +1,6 @@
 # pyrefly: ignore [missing-import]
 import os
+import sys
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -25,6 +26,12 @@ os.makedirs("results", exist_ok=True)
 
 # 1. Load the dataset
 dataset_path = os.path.join("dataset", "creditcard_2023.csv")
+if not os.path.exists(dataset_path):
+    print(f"Error: Dataset not found at '{dataset_path}'.")
+    print("Please download 'creditcard_2023.csv' from Kaggle and place it in the dataset/ folder.")
+    print("See dataset/README.md for download instructions.")
+    sys.exit(1)
+
 df = pd.read_csv(dataset_path)
 
 # 2. Basic Dataset Info
@@ -58,7 +65,7 @@ plt.title("Correlation of Anonymized Features (V1-V28) and Amount with Fraud (Cl
 plt.ylabel("Pearson Correlation Coefficient")
 plt.xlabel("Features")
 plt.tight_layout()
-plt.savefig("results\\dataset_feature_correlation_matrix.png")
+plt.savefig(os.path.join("results", "dataset_feature_correlation_matrix.png"))
 
 print("Top 3 features positively correlated with fraud:")
 print(corr_with_class.tail(3))
@@ -66,18 +73,17 @@ print("\nTop 3 features negatively correlated with fraud:")
 print(corr_with_class.head(3))
 
 
-#Shabiba Binta Shahadat (22101907)
+
 # ANALYSIS 2: Transaction Amount Comparison
 plt.figure(figsize=(10, 6))
 sns.boxplot(x="Class", y="Amount", data=df, showfliers=False, palette="Set2")
 plt.title("Transaction Amount Distribution: Legitimate (0) vs Fraudulent (1)")
 plt.xticks([0, 1], ["Legitimate", "Fraudulent"])
 plt.ylabel("Transaction Amount")
-plt.savefig("results\\dataset_transaction_boxplot.png")
+plt.savefig(os.path.join("results", "dataset_transaction_boxplot.png"))
 
-#Shabiba Binta Shahadat (22101907)
+
 # ANALYSIS 3: Feature Distribution (Density Plots)
-# take two features that had high correlation from Analysis 1
 
 features_to_plot = ["V11", "V4"]
 fig, axes = plt.subplots(1, 2, figsize=(14, 5))
@@ -100,7 +106,7 @@ for i, feature in enumerate(features_to_plot):
     axes[i].legend()
 
 plt.tight_layout()
-plt.savefig("results\\dataset_feature_distribution.png")
+plt.savefig(os.path.join("results", "dataset_feature_distribution.png"))
 
 
 # Sample the data to make plotting faster and clearer
@@ -119,7 +125,7 @@ pair_plot = sns.pairplot(
     diag_kind="kde",
 )
 pair_plot.fig.suptitle("Bivariate Interactions of Top Correlated Features", y=1.02)
-plt.savefig("results\\dataset_feature_interaction(Bivariate_Interactions).png")
+plt.savefig(os.path.join("results", "dataset_feature_interaction(Bivariate_Interactions).png"))
 
 # ANALYSIS 5: t-SNE Manifold Visualization
 print("Generating t-SNE Visualization")
@@ -141,7 +147,7 @@ plt.title("t-SNE Projection of Transaction Data (10,000 sample)")
 plt.xlabel("t-SNE Dimension 1")
 plt.ylabel("t-SNE Dimension 2")
 plt.legend(title="Class", labels=["Legitimate (0)", "Fraudulent (1)"])
-plt.savefig("results\\dataset_feature_t-SNE_visualization.png")
+plt.savefig(os.path.join("results", "dataset_feature_t-SNE_visualization.png"))
 
 
 # Training Basic Model Logistic Regression and Random Forest
@@ -187,7 +193,7 @@ sns.heatmap(
 plt.title("Confusion Matrix - Logistic Regression")
 plt.ylabel("Actual Class")
 plt.xlabel("Predicted Class")
-plt.savefig("results\\logistic_regression_confusion_matrix.png")
+plt.savefig(os.path.join("results", "logistic_regression_confusion_matrix.png"))
 
 # MODEL 2: Random Forest
 print("\n--- Training Random Forest ---")
@@ -200,7 +206,7 @@ rf_predictions = rf_model.predict(X_test)
 report = classification_report(y_test, rf_predictions)
 print("Random Forest Results:")
 print(report)
-with open("results\\random_forest_report.txt", "w") as f:
+with open(os.path.join("results", "random_forest_report.txt"), "w") as f:
     f.write("Random Forest Results:\n")
     f.write(report)
 
@@ -218,7 +224,7 @@ sns.heatmap(
 plt.title("Confusion Matrix - Random Forest")
 plt.ylabel("Actual Class")
 plt.xlabel("Predicted Class")
-plt.savefig("results\\random_forest_confusion_matrix.png")
+plt.savefig(os.path.join("results", "random_forest_confusion_matrix.png"))
 
 
 # Building/Trainig Simple DNN Model
@@ -346,10 +352,10 @@ sns.heatmap(
 plt.title("Confusion Matrix - Deep Neural Network")
 plt.ylabel("Actual Class")
 plt.xlabel("Predicted Class")
-plt.savefig("results\\dnn_confusion_matrix.png")
+plt.savefig(os.path.join("results", "dnn_confusion_matrix.png"))
 
 # Load DNN Model
-checkpoint = torch.load("results\\dnn_model.pt", weights_only=False)
+checkpoint = torch.load(os.path.join("results", "dnn_model.pt"), weights_only=False)
 
 loaded_model = DNNClassifier(checkpoint["model_config"]["input_dim"])
 loaded_model.load_state_dict(checkpoint["model_state_dict"])
@@ -359,7 +365,7 @@ scaler = checkpoint["scaler"]
 print("Model loaded successfully")
 
 
-#Shabiba Binta Shahadat (22101907)
+
 # REAL-WORLD SIMULATION
 print("\n--- Creating Real-World Imbalanced Test Set (99:1) ---")
 test_df = X_test.copy()
@@ -409,7 +415,7 @@ sns.heatmap(
 plt.title(f"DNN Confusion Matrix (Threshold 0.5 fixed)")
 plt.ylabel("Actual Class")
 plt.xlabel("Predicted Class")
-plt.savefig("results\\dnn_real_world_fixed_threshold_confusion_matrix.png")
+plt.savefig(os.path.join("results", "dnn_real_world_fixed_threshold_confusion_matrix.png"))
 
 
 # ALGORITHMIC THRESHOLD OPTIMIZATION
@@ -443,7 +449,7 @@ plt.xlabel("Probability Threshold")
 plt.ylabel("F1-Score")
 plt.legend()
 plt.tight_layout()
-plt.savefig("results\\threshold_optimization_curve.png")
+plt.savefig(os.path.join("results", "threshold_optimization_curve.png"))
 
 # Final Test with Optimal Threshold
 dnn_rw_predictions_optimal = (dnn_rw_probabilities > optimal_threshold).astype(int)
@@ -451,7 +457,7 @@ dnn_rw_predictions_optimal = (dnn_rw_probabilities > optimal_threshold).astype(i
 report_rw = classification_report(y_real_world, dnn_rw_predictions_optimal)
 print(f"\nDeep Neural Network Real-World Results (With optimal threshold {optimal_threshold:.4f}):")
 print(report_rw)
-with open("results\\dnn_real_world_optimal_threshold_report.txt", "w") as f:
+with open(os.path.join("results", "dnn_real_world_optimal_threshold_report.txt"), "w") as f:
     f.write(f"DNN Real-World Results With Optimal Threshold (Threshold {optimal_threshold:.4f}):\n")
     f.write(report_rw)
 
@@ -469,6 +475,6 @@ sns.heatmap(
 plt.title(f"DNN Confusion Matrix (Optimal Threshold: {optimal_threshold:.4f})")
 plt.ylabel("Actual Class")
 plt.xlabel("Predicted Class")
-plt.savefig("results\\dnn_real_world_optimal_threshold_confusion_matrix.png")
+plt.savefig(os.path.join("results", "dnn_real_world_optimal_threshold_confusion_matrix.png"))
 
 print("\nAll Complete")

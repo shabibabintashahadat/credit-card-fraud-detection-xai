@@ -1,4 +1,5 @@
 import os
+import sys
 import lime
 import lime.lime_tabular
 import matplotlib.pyplot as plt
@@ -41,6 +42,11 @@ class DNNClassifier(nn.Module):
 
 # 2. LOAD SAVED MODEL, SCALER, AND DATA
 model_path = os.path.join("results", "dnn_model.pt")
+if not os.path.exists(model_path):
+    print(f"Error: Model checkpoint not found at '{model_path}'.")
+    print("Please run 'python main.py' first to train and save the model.")
+    sys.exit(1)
+
 print(f"Loading model and scaler from {model_path}...")
 checkpoint = torch.load(model_path, weights_only=False)
 scaler = checkpoint["scaler"]
@@ -50,8 +56,14 @@ model = DNNClassifier(input_dim)
 model.load_state_dict(checkpoint["model_state_dict"])
 model.eval()
 
-print("Loading dataset...")
 dataset_path = os.path.join("dataset", "creditcard_2023.csv")
+if not os.path.exists(dataset_path):
+    print(f"Error: Dataset not found at '{dataset_path}'.")
+    print("Please download 'creditcard_2023.csv' from Kaggle and place it in the dataset/ folder.")
+    print("See dataset/README.md for download instructions.")
+    sys.exit(1)
+
+print("Loading dataset...")
 df = pd.read_csv(dataset_path)
 if "id" in df.columns:
     df = df.drop("id", axis=1)
@@ -95,8 +107,9 @@ plt.figure(figsize=(10, 6))
 shap.summary_plot(shap_values, test_data, feature_names=feature_names, show=False)
 plt.title("SHAP Summary Plot: Global Feature Importance")
 plt.tight_layout()
-plt.savefig("results\\xai_shap_summary.png")
-print("Saved SHAP plot to results\\xai_shap_summary.png")
+shap_out_path = os.path.join("results", "xai_shap_summary.png")
+plt.savefig(shap_out_path)
+print(f"Saved SHAP plot to {shap_out_path}")
 plt.clf()
 
 
@@ -124,7 +137,8 @@ exp = explainer_lime.explain_instance(
 fig = exp.as_pyplot_figure()
 plt.title(f"LIME Explanation for Fraudulent Transaction (ID: {sample_idx})", y=1.05)
 plt.tight_layout()
-plt.savefig("results\\xai_lime_explanation.png")
-print("Saved LIME plot to results\\xai_lime_explanation.png")
+lime_out_path = os.path.join("results", "xai_lime_explanation.png")
+plt.savefig(lime_out_path)
+print(f"Saved LIME plot to {lime_out_path}")
 
 print("\nXAI Complete.")

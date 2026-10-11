@@ -7,11 +7,11 @@
 [![Scikit-Learn](https://img.shields.io/badge/Scikit--Learn-F7931E?logo=scikit-learn&logoColor=white)](https://scikit-learn.org/)
 [![Explainable AI](https://img.shields.io/badge/XAI-SHAP%20%7C%20LIME-green.svg)](https://github.com/shap/shap)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Conference Paper](https://img.shields.io/badge/Paper-IEEE%20Format-8A2BE2.svg)](docs/IEEE_Conference_CSE437.pdf)
+[![Conference Paper](https://img.shields.io/badge/Paper-IEEE%20Format-8A2BE2.svg)](docs/report.pdf)
 
 **A high-performance machine learning and deep learning framework for robust financial fraud detection, featuring real-world imbalance simulation, algorithmic decision threshold optimization, and transparent model interpretability via SHAP and LIME.**
 
-[Overview](#-project-overview) • [Architecture](#-system-architecture) • [Key Features](#-key-features) • [Results](#-benchmark-results) • [Interpretability](#-explainable-ai-xai) • [Installation](#-getting-started) • [Contributors](#-contributors)
+[Overview](#-project-overview) • [Architecture](#-system-architecture) • [Key Features](#-key-features) • [Results](#-benchmark-results) • [Interpretability](#-explainable-ai-xai) • [Installation](#-getting-started) • [Author](#-author)
 
 </div>
 
@@ -112,8 +112,8 @@ Financial regulations (e.g., GDPR Article 22) require explanations for automated
 ├── dataset/
 │   └── README.md             # Dataset instructions and Kaggle download link
 ├── docs/
-│   ├── IEEE_Conference_CSE437.pdf                  # Complete IEEE conference research paper
-│   └── CSE437 Code Contribution and Result Details.pdf  # Project & team report
+│   ├── report.pdf            # Complete IEEE conference research paper
+│   └── paper_report.tex      # LaTeX source code
 ├── results/
 │   ├── .gitkeep              # Preserves output directory structure
 │   └── ...                   # Generated confusion matrices, curves & reports
