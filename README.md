@@ -174,14 +174,10 @@ All plots, metrics, confusion matrices, and saved PyTorch checkpoints will be sa
 
 ---
 
-## 👥 Contributors
+## 👤 Author
 
-This research and implementation was developed for **Data Science (CSE 437)**:
-
-* **Shabiba Binta Shahadat** (Student ID: `22101907`) — Transaction Amount Analysis, Logistic Regression Modeling, Real-World Imbalance Stress Testing.
-* **A Z M Bodruddoza Bijoy** (Student ID: `22301678`) — Data Preprocessing, Correlation Matrix Analysis, Stratified Data Splitting, Model Serialization.
-* **Sadman Bin Anwar Siam** (Student ID: `22301514`) — Bivariate Interaction Analysis, Deep Neural Network Architecture, Algorithmic Threshold Calibration, XAI Integration.
-* **Fariha Yasmin** (Student ID: `22301331`) — t-SNE Manifold Visualization, Random Forest Classifier, Real-world Model Evaluation.
+Developed by **Shabiba Binta Shahadat** (Student ID: `22101907`)  
+Department of Computer Science and Engineering, Brac University.
 
 ---
 
@@ -189,11 +185,11 @@ This research and implementation was developed for **Data Science (CSE 437)**:
 
 This project is licensed under the [MIT License](LICENSE).
 
-If you find this work or the associated paper useful in your research, please cite:
+If you find this work or paper useful in your research, please cite:
 ```bibtex
 @article{shahadat2024creditcard,
   title={Explainable Deep Learning Framework for Credit Card Fraud Detection Under Imbalanced Distributions},
-  author={Shahadat, Shabiba Binta and Bijoy, A Z M Bodruddoza and Siam, Sadman Bin Anwar and Yasmin, Fariha},
+  author={Shahadat, Shabiba Binta},
   journal={Department of Computer Science and Engineering, CSE 437},
   year={2024}
 }

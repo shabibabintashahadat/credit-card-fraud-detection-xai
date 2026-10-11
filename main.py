@@ -23,7 +23,6 @@ from torch.utils.data import DataLoader, TensorDataset
 # Ensure results folder exists
 os.makedirs("results", exist_ok=True)
 
-#A Z M Bodruddoza Bijoy (22301678)
 # 1. Load the dataset
 dataset_path = os.path.join("dataset", "creditcard_2023.csv")
 df = pd.read_csv(dataset_path)
@@ -48,7 +47,6 @@ sns.set_style("whitegrid")
 plt.rcParams.update({"font.size": 12})
 
 
-#A Z M Bodruddoza Bijoy (22301678)
 # ANALYSIS 1: Correlation Matrix
 plt.figure(figsize=(12, 8))
 corr = df.corr()
@@ -108,7 +106,6 @@ plt.savefig("results\\dataset_feature_distribution.png")
 # Sample the data to make plotting faster and clearer
 df_sample = df.sample(n=10000, random_state=42)
 
-#Sadman Bin Anwar Siam (22301514)
 # ANALYSIS 4: Bivariate Interactions (Top 3 Features)
 print("Generating Pairplot...")
 top_features = ["V2", "V4", "V11"]
@@ -124,7 +121,6 @@ pair_plot = sns.pairplot(
 pair_plot.fig.suptitle("Bivariate Interactions of Top Correlated Features", y=1.02)
 plt.savefig("results\\dataset_feature_interaction(Bivariate_Interactions).png")
 
-#Fariha Yasmin (22301331)
 # ANALYSIS 5: t-SNE Manifold Visualization
 print("Generating t-SNE Visualization")
 X_sample = df_sample.drop("Class", axis=1)
@@ -150,7 +146,6 @@ plt.savefig("results\\dataset_feature_t-SNE_visualization.png")
 
 # Training Basic Model Logistic Regression and Random Forest
 
-#A Z M Bodruddoza Bijoy (22301678)
 # Split features (X) and target (y)
 X = df.drop("Class", axis=1)
 y = df["Class"]
@@ -194,7 +189,6 @@ plt.ylabel("Actual Class")
 plt.xlabel("Predicted Class")
 plt.savefig("results\\logistic_regression_confusion_matrix.png")
 
-#Fariha Yasmin (22301331)
 # MODEL 2: Random Forest
 print("\n--- Training Random Forest ---")
 rf_model = RandomForestClassifier(
@@ -227,7 +221,6 @@ plt.xlabel("Predicted Class")
 plt.savefig("results\\random_forest_confusion_matrix.png")
 
 
-#Sadman Bin Anwar Siam (22301514)
 # Building/Trainig Simple DNN Model
 
 scaler = StandardScaler()
@@ -390,7 +383,6 @@ print(f"Legitimate (0): {len(legit_test)} | Fraud (1): {len(fraud_test_sampled)}
 X_rw_scaled = scaler.transform(X_real_world)
 X_rw_tensor = torch.FloatTensor(X_rw_scaled)
 
-#Fariha Yasmin (22301331)
 with torch.no_grad():
     dnn_rw_probabilities = loaded_model(X_rw_tensor).numpy().flatten()
 
@@ -420,7 +412,6 @@ plt.xlabel("Predicted Class")
 plt.savefig("results\\dnn_real_world_fixed_threshold_confusion_matrix.png")
 
 
-#Sadman Bin Anwar Siam (22301514)
 # ALGORITHMIC THRESHOLD OPTIMIZATION
 print("\n--- Algorithmic Threshold Optimization ---")
 precisions, recalls, thresholds = precision_recall_curve(

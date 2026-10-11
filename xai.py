@@ -39,7 +39,6 @@ class DNNClassifier(nn.Module):
         return self.network(x)
 
 
-#A Z M Bodruddoza Bijoy (22301678)
 # 2. LOAD SAVED MODEL, SCALER, AND DATA
 model_path = os.path.join("results", "dnn_model.pt")
 print(f"Loading model and scaler from {model_path}...")
@@ -69,7 +68,6 @@ X_scaled = scaler.transform(X_sample)
 X_tensor = torch.FloatTensor(X_scaled)
 
 
-#Sadman Bin Anwar Siam (22301514)
 # 3. WRAPPER FUNCTION FOR LIME AND SHAP
 def predict_proba_wrapper(numpy_data):
     tensor_data = torch.FloatTensor(numpy_data)
