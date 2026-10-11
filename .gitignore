@@ -1,0 +1,39 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Large Datasets (Avoid exceeding GitHub 100MB limit)
+dataset/*.csv
+*.csv
+*.tsv
+*.parquet
+
+# Model weights & Large binaries
+results/*.pt
+results/*.pth
+results/*.onnx
+*.pt
+*.pkl
+
+# Environments
+.venv/
+venv/
+ENV/
+env/
+env.bak/
+venv.bak/
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints
+
+# IDE / OS specific files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Keep results and dataset directories tracked
+!results/.gitkeep
+!dataset/.gitkeep
+!dataset/README.md
