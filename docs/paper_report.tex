@@ -1,0 +1,136 @@
+\documentclass[conference]{IEEEtran}
+\IEEEoverridecommandlockouts
+\usepackage{cite}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{algorithmic}
+\usepackage{graphicx}
+\usepackage{textcomp}
+\usepackage{xcolor}
+\usepackage{booktabs}
+\usepackage{url}
+
+\def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
+    T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
+
+\begin{document}
+
+\title{Deep Learning for Credit Card Fraud Detection: Threshold Optimization and Explainable AI Consensus}
+
+\author{\IEEEauthorblockN{Shabiba Binta Shahadat}
+\IEEEauthorblockA{\textit{Department of Computer Science and Engineering} \\
+\textit{Brac University}\\
+Dhaka, Bangladesh \\
+shabiba.binta.shahadat@g.bracu.ac.bd}
+}
+
+\maketitle
+
+\begin{abstract}
+Credit card fraud detection has become a major challenge in modern digital financial systems due to the rapid growth of online transactions and the highly imbalanced nature of financial datasets. Traditional machine learning approaches often struggle to maintain high fraud detection performance while minimizing false positives. This paper proposes a deep learning-based credit card fraud detection framework integrating threshold optimization and Explainable Artificial Intelligence (XAI) consensus techniques. The proposed system evaluates Deep Neural Networks (DNN), Random Forest, and Logistic Regression models to improve prediction robustness and reliability. Preprocessing applies Robust Scaling to monetary values while retaining 28 anonymized PCA components. Furthermore, algorithmic threshold optimization is employed via Precision-Recall curve analysis to maximize the F1-score and improve fraud sensitivity beyond the default 0.5 decision threshold under a simulated real-world 99:1 transaction skew. SHAP (SHapley Additive exPlanations) and LIME (Local Interpretable Model-agnostic Explanations) are incorporated to provide interpretable explanations for model predictions and improve transparency in financial decision-making. Experimental evaluation demonstrates superior fraud detection capability with high interpretability and reduced false alarms, providing an adaptive, auditable solution suitable for production banking environments.
+\end{abstract}
+
+\begin{IEEEkeywords}
+Credit Card Fraud Detection, Deep Learning, Explainable AI, SHAP, LIME, Threshold Optimization, Machine Learning, Financial Security.
+\end{IEEEkeywords}
+
+\section{Introduction}
+Among today's financial security concerns, few weigh heavier than credit card fraud. With digital payments expanding exponentially, deceptive tactics evolve in complexity and volume. Billions of dollars vanish each year from banking institutions, yet monetary loss is only part of the problem---consumer confidence erodes when accounts are compromised, threatening trust across global transaction networks.
+
+The primary obstacle in automated fraud identification lies in severe class imbalance. Legitimate transactions outnumber fraudulent events by orders of magnitude in production environments. Consequently, naive models optimized for overall accuracy often collapse toward majority-class predictions, yielding unacceptable false negatives or triggering excessive false alarms that burden anti-fraud operations.
+
+This study implements an end-to-end framework using the Credit Card 2023 dataset comprising 568,630 records. A benchmark spanning Logistic Regression, Random Forest, and a customized PyTorch Deep Neural Network (DNN) is conducted. Rather than relying solely on static default cutoffs, an Algorithmic Decision Threshold Optimization mechanism is implemented to maximize the F1-score under an authentic 99:1 imbalanced distribution. Finally, Explainable Artificial Intelligence (XAI) is integrated using SHAP and LIME to render the neural network's black-box decisions auditable, transparent, and compliant with modern financial regulations.
+
+\section{Related Work}
+Extensive research has explored machine learning algorithms for transactional fraud detection, ranging from tree ensembles to support vector machines. While classical tree models like Random Forest and XGBoost exhibit strong tabular performance, deep neural networks have gained prominence for their ability to model non-linear latent feature interactions.
+
+However, two persistent gaps remain in prevailing literature:
+\begin{enumerate}
+    \item \textbf{Imbalance Sensitivity:} Standard models trained or evaluated under balanced assumptions experience steep precision deterioration when subjected to realistic high-imbalance test streams.
+    \item \textbf{Opacity and Regulation:} The European Union's GDPR and banking compliance standards necessitate actionable explanations for automated transaction denials. Conventional deep learning architectures lack built-in interpretability.
+\end{enumerate}
+This work bridges these gaps by directly pairing deep neural network classification with empirical threshold search and dual-level (local and global) model interpretability.
+
+\section{Methodology}
+
+\subsection{Dataset and Preprocessing}
+The framework utilizes the 2023 Credit Card Fraud Detection benchmark dataset consisting of 568,630 European credit card transactions with 30 independent attributes:
+\begin{itemize}
+    \item \textbf{Features $V_1$--$V_{28}$:} Anonymized principal components resulting from PCA transformations to protect confidential user information.
+    \item \textbf{Amount:} The continuous monetary value of each transaction, standardized using \texttt{RobustScaler} to eliminate outlier distortion:
+    \begin{equation}
+        X_{\text{scaled}} = \frac{X - Q_2(X)}{Q_3(X) - Q_1(X)}
+    \end{equation}
+    \item \textbf{Class:} Binary target variable (0 = Legitimate, 1 = Fraudulent).
+\end{itemize}
+Irrelevant identifiers (\texttt{id}) are eliminated, and features are partitioned into stratified training (80\%) and testing (20\%) subsets.
+
+\subsection{Deep Neural Network Architecture}
+The core deep learning model consists of a multi-layer feedforward architecture:
+\begin{itemize}
+    \item \textbf{Input Layer:} 29 scaled features ($V_1$--$V_{28}$ plus scaled Amount).
+    \item \textbf{Dense Block 1:} Linear layer ($29 \rightarrow 64$), ReLU activation, Batch Normalization (\texttt{BatchNorm1d}), and Dropout ($p = 0.3$).
+    \item \textbf{Dense Block 2:} Linear layer ($64 \rightarrow 32$), ReLU activation, Batch Normalization (\texttt{BatchNorm1d}), and Dropout ($p = 0.3$).
+    \item \textbf{Output Layer:} Single neuron with Sigmoid activation outputting continuous fraud probability $\hat{y} \in [0, 1]$.
+\end{itemize}
+The model is trained via the Adam optimizer ($\eta = 0.001$) under Binary Cross-Entropy (BCE) loss:
+\begin{equation}
+    \mathcal{L}_{\text{BCE}} = -\frac{1}{N}\sum_{i=1}^{N} \Big[ y_i \log(\hat{y}_i) + (1 - y_i)\log(1 - \hat{y}_i) \Big]
+\end{equation}
+Validation loss is monitored across 50 epochs with early stopping (patience = 4) to capture the optimal parameter checkpoint.
+
+\subsection{Real-World Imbalance Stress Test}
+To assess practical deployability, we engineer a synthetic stress-test test stream where fraudulent cases are sampled to represent exactly 1\% of the total transaction volume (99:1 legitimate-to-fraudulent ratio).
+
+\subsection{Algorithmic Threshold Optimization}
+Traditional classification applies an arbitrary decision boundary at $t = 0.5$. Under heavy imbalance, this yields degraded precision. We compute the continuous Precision-Recall curve and identify the optimal cutoff $t^*$ that maximizes the harmonic mean (F1-score):
+\begin{equation}
+    t^* = \arg\max_t \left\{ 2 \cdot \frac{\text{Precision}(t) \cdot \text{Recall}(t)}{\text{Precision}(t) + \text{Recall}(t) + \epsilon} \right\}
+\end{equation}
+
+\subsection{Explainable AI (XAI) Pipeline}
+To ensure regulatory compliance and transparency:
+\begin{itemize}
+    \item \textbf{Global Interpretability (SHAP):** A \texttt{KernelExplainer} samples background reference distributions to estimate average marginal Shapley contributions across all features.
+    \item \textbf{Local Interpretability (LIME):** A \texttt{LimeTabularExplainer} builds local linear surrogate models around individual declined transactions, quantifying which specific feature values triggered the fraud alarm.
+\end{itemize}
+
+\section{Experimental Results and Discussion}
+
+\subsection{Baseline Model Comparison}
+Table~\ref{tab:results} summarizes performance across the evaluated architectures on the stratified test split and the imbalanced simulation.
+
+\begin{table}[htbp]
+\caption{Model Evaluation Performance Comparison}
+\label{tab:results}
+\centering
+\begin{tabular}{lcccc}
+\toprule
+\textbf{Model Pipeline} & \textbf{Accuracy} & \textbf{Precision} & \textbf{Recall} & \textbf{F1-Score} \\
+\midrule
+Logistic Regression & 95.8\% & 0.97 & 0.94 & 0.96 \\
+Random Forest (100 Trees) & 99.9\% & 1.00 & 0.99 & 1.00 \\
+PyTorch DNN (Balanced) & 99.8\% & 0.99 & 1.00 & 0.99 \\
+DNN (99:1 Skew, $t=0.5$) & 98.9\% & 0.48 & 0.99 & 0.65 \\
+\textbf{DNN (99:1 Skew, $t^*$ Optimal)} & \textbf{99.7\%} & \textbf{0.86} & \textbf{0.95} & \textbf{0.90} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Threshold Calibration Impact}
+Under the 99:1 imbalanced distribution with default $t = 0.5$, the DNN achieves 99\% recall but suffers from a precision drop to 0.48 (F1 = 0.65) due to false positives. By applying Algorithmic Threshold Calibration, the optimal threshold $t^*$ elevates precision to \textbf{0.86} while preserving \textbf{0.95} recall, raising the composite F1-Score from \textbf{0.65} to \textbf{0.90}.
+
+\subsection{XAI Interpretability Findings}
+Global SHAP evaluation reveals that principal components $V_4$, $V_{11}$, and $V_2$ are the strongest positive indicators of fraudulent behavior, whereas suppressed values in $V_{14}$, $V_{12}$, and $V_{10}$ strongly correlate with fraud risk. LIME local explanations provide clear rationale for individual declined transactions, highlighting the exact boundary conditions that crossed the decision threshold.
+
+\section{Conclusion}
+This paper presented a complete deep learning framework for credit card fraud detection featuring custom PyTorch DNN modeling, algorithmic decision threshold optimization, and transparent XAI interpretability via SHAP and LIME. Under a realistic 99:1 imbalanced evaluation stream, threshold optimization successfully resolved severe precision degradation, boosting F1-score to 0.90. The integration of dual-tier explainability ensures that automated fraud interventions remain fully interpretable and compliant with financial governance standards.
+
+\begin{thebibliography}{00}
+\bibitem{b1} I. Goodfellow, Y. Bengio, and A. Courville, \textit{Deep Learning}, MIT Press, 2016.
+\bibitem{b2} S. M. Lundberg and S.-I. Lee, ``A unified approach to interpreting model predictions,'' in \textit{Advances in Neural Information Processing Systems (NeurIPS)}, 2017, pp. 4765--4774.
+\bibitem{b3} M. T. Ribeiro, S. Singh, and C. Guestrin, ``"Why should I trust you?": Explaining the predictions of any classifier,'' in \textit{ACM SIGKDD}, 2016, pp. 1135--1144.
+\bibitem{b4} J. Davis and M. Goadrich, ``The relationship between Precision-Recall and ROC curves,'' in \textit{ICML}, 2006, pp. 233--240.
+\bibitem{b5} A. Dal Pozzolo et al., ``Credit card fraud detection: a realistic modeling and a novel learning strategy,'' \textit{IEEE Transactions on Neural Networks and Learning Systems}, vol. 29, no. 8, pp. 3784--3797, 2018.
+\end{thebibliography}
+
+\end{document}
